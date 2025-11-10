@@ -110,6 +110,7 @@ jobs:
           host: ${{ env.NGINX_SERVER }}
           username: ${{ secrets.NGINX_SSH_USER }}
           key: ${{ secrets.NGINX_SSH_KEY }}
+          envs: NEXUS_URL,NEXUS_REPO,NEXUS_GROUP,NEXUS_ARTIFACT,NGINX_WEB_ROOT
           script: |
             set -e
             cd /tmp

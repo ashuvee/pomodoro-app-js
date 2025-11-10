@@ -38,14 +38,36 @@ https://github.com/YOUR_USERNAME/pomodoro-app-js/settings/secrets/actions
 #### Secret 6: NGINX_SSH_KEY
 - **Name**: `NGINX_SSH_KEY`
 - **Value**: Your EC2 private key content
-  - Open your .pem file
-  - Copy entire content including:
-    ```
-    -----BEGIN RSA PRIVATE KEY-----
-    [your key content]
-    -----END RSA PRIVATE KEY-----
-    ```
-  - Paste as secret value
+  
+  **IMPORTANT - How to copy the key correctly:**
+  
+  Option A - Using terminal (Linux/Mac):
+  ```bash
+  cat your-key.pem
+  ```
+  Copy the ENTIRE output including headers
+  
+  Option B - Using text editor:
+  1. Open your .pem file in a text editor (NOT Word/Notepad++)
+  2. Copy EVERYTHING from first line to last line
+  3. Must include these lines:
+     ```
+     -----BEGIN RSA PRIVATE KEY-----
+     [multiple lines of key content]
+     -----END RSA PRIVATE KEY-----
+     ```
+     OR
+     ```
+     -----BEGIN OPENSSH PRIVATE KEY-----
+     [multiple lines of key content]
+     -----END OPENSSH PRIVATE KEY-----
+     ```
+  
+  **Common Mistakes to Avoid:**
+  - ❌ Don't add extra spaces or newlines at start/end
+  - ❌ Don't copy only part of the key
+  - ❌ Don't use Windows Notepad (it may change line endings)
+  - ✅ Use a proper text editor or terminal cat command
 
 ### 3. Verify All Secrets Are Added
 
@@ -84,7 +106,21 @@ git push origin main
 - Ensure the `raw-releases` repository exists in Nexus
 
 ### If Nginx deployment fails:
-- Check NGINX_SSH_USER is correct (usually `ubuntu` or `ec2-user`)
-- Verify NGINX_SSH_KEY is the complete private key content
-- Ensure SSH access is allowed in security group (port 22)
+
+**Error: "ssh: no key found" or "handshake failed":**
+- The SSH key format is incorrect
+- Solution:
+  1. Delete the current NGINX_SSH_KEY secret
+  2. Re-add it using `cat your-key.pem` command
+  3. Make sure you copy the ENTIRE key with headers/footers
+  4. Ensure no extra spaces at beginning or end
+
+**Error: "Permission denied":**
+- Check NGINX_SSH_USER is correct (usually `ubuntu` for Ubuntu, `ec2-user` for Amazon Linux)
+- Verify the SSH key matches the server
+- Ensure SSH access is allowed in security group (port 22 open)
+
+**Error: "Connection timeout":**
 - Verify Nginx server is running at 3.88.108.148
+- Check security group allows inbound SSH (port 22) from GitHub IPs
+- Ensure the server is in running state (not stopped)
